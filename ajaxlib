@@ -1,0 +1,13 @@
+AJAX
+
+data: {
+	
+}
+
+Je ono sto se salje kroz $_POST;
+
+success: {
+	
+}
+
+je ono sto dolazi kroz exit();

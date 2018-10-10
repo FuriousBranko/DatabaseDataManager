@@ -7,7 +7,7 @@
 </head>
 
 <body>
-
+    
 <div class="container" style="margin-top: 30px;">
 
 <div class="modal fade" id="tableManager" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -25,12 +25,12 @@
 		        <input type="text" class="form-control" id="countryName" placeholder="Country name: "><br>
 		        <textarea class="form-control" id="shortDesc" placeholder="Short description: "></textarea><br>
 		        <textarea class="form-control" id="longDesc" placeholder="Long description: "></textarea>
-		        <input type="hidden" id="editRowID" value="0">
+		        <input type="hidden" id="currentRowID" value="0">
       		</div>
 
 	      	<div class="modal-footer">
 	        	<input type="button" class="btn btn-secondary" data-dismiss="modal" value="Close">
-	        	<input type="button" class="btn btn-primary" value="Insert" id="addNew" onclick="manageData('insertRow');">
+	        	<input type="button" class="btn btn-primary" value="Insert" id="actionButton" onclick="manageData('insertRow');">
       		</div>
 
     	</div>
@@ -42,7 +42,7 @@
 		<div class="col-md-8 col-md-offset-2">
 			<h2>MySQL Data Manager</h2>
 			<br><br>
-			<input style="float:right;" type="button" class="btn btn-success" data-toggle="modal" data-target="#tableManager" id="AddNew" value="Add new">
+			<input style="float:right;" type="button" class="btn btn-success" data-toggle="modal" data-target="#tableManager" id="addNew" value="Add new">
 				<table class="table table-hover table-bordered">
 					<thead class="thead-dark">
 						<tr>
@@ -72,11 +72,17 @@
 <script type="text/javascript">
 	
 	$(document).ready(function() {
+        $("#addNew").on('click',function() {
+            $("#countryName").val('');
+            $("#shortDesc").val('');
+            $("#longDesc").val('');
+            $("#actionButton").val('Insert').attr('class','btn btn-primary');
+        });
 
-		getExistingData(0,10);
+		generateData(0,10);
 	});
 
-	function getExistingData(start, limit)
+	function generateData(start, limit)
 	{
 		$.ajax({
 
@@ -93,7 +99,7 @@
 				if(response != 'reachedMax') {
 					$('tbody').append(response);
 					start+=limit;
-					getExistingData(start, limit);
+					generateData(start, limit);
 				} else {
 					$('.table').DataTable();
 				}
@@ -101,12 +107,42 @@
 		});
 	}
 
-	function manageData(key)
+    // this is function for reading data via ID,
+    // fatching data with json
+	function readOrEdit(rowID)
 	{
 		var countryName = $("#countryName");
 		var shortDesc = $("#shortDesc");
 		var longDesc = $("#longDesc");
 
+		$.ajax({
+
+			url: 'ajax.php',
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				key: 'readRow',
+				rowID: rowID
+			},
+			success: function(response)
+			{
+                $("#actionButton").val("Edit").attr('onclick','manageData("editRow")');
+				$("#currentRowID").val(response.rowID);
+				$("#countryName").val(response.countryName);
+				$("#shortDesc").val(response.shortDesc);
+				$("#longDesc").val(response.longDesc);
+			}
+		});		
+	}
+
+    // this is for button where we submit/edit fields
+	function manageData(key)
+	{
+		var countryName = $("#countryName");
+		var shortDesc = $("#shortDesc");
+		var longDesc = $("#longDesc");
+		var rowID = $("#currentRowID");
+		
 		if(isNotEmpty(countryName) && isNotEmpty(shortDesc) && isNotEmpty(longDesc)) {
 			
 			$.ajax({
@@ -119,11 +155,13 @@
 					countryName: countryName.val(),
 					shortDesc: shortDesc.val(),
 					longDesc: longDesc.val(),
+					rowID: rowID.val()
 				},
 				success: function(response)
 				{
 					if(response == 'success') {
 						$("#tableManager").modal('hide');
+
 						countryName.val('').css('border', '');
 						shortDesc.val('').css('border', '');
 						longDesc.val('').css('border', '');
