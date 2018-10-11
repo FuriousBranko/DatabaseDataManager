@@ -84,7 +84,7 @@
             $("#countryName").val('');
             $("#shortDesc").val('');
             $("#longDesc").val('');
-            $("#actionButton").val('Insert').attr('class','btn btn-primary').attr('style','display: show');
+            $("#actionButton").val('Insert').attr('class','btn btn-primary').attr('style','display: show').attr('onclick',"manageData('insertRow')");
             $("#modal-edit").attr('style','display: show');
             $("#modal-view").attr('style','display: none');   
             $("#modalTitle").text("Insert data");     
