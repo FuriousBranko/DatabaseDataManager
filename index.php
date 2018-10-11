@@ -93,6 +93,7 @@
 		generateData(0,10);
 	});
 
+    // for generating table with data
 	function generateData(start, limit)
 	{
 		$.ajax({
@@ -120,7 +121,6 @@
 
     // this is function for reading data via ID,
     // fatching data with json
-    // if type - 0, then is edit mode
 	function readOrEdit(rowID, readModal=0)
 	{
 		var countryName = $("#countryName");
@@ -159,7 +159,7 @@
 			}
 		});		
 	}
-
+    // for deleting row
     function deleteRow(rowID)
     {
             if(confirm("Are you sure?")) {
@@ -221,6 +221,7 @@
 
 		}
 	}
+
 
 	function isNotEmpty(caller)
 	{
