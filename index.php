@@ -10,23 +10,32 @@
     
 <div class="container" style="margin-top: 30px;">
 
-<div class="modal fade" id="tableManager" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal for edit/add -->
+<div class="modal fade" id="modalReadEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
 
       		<div class="modal-header">
-	        	<h5 class="modal-title" id="modalTitle">Country Name</h5>
+	        	<h3 class="modal-title" id="modalTitle"></h3>
 	        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          		<span aria-hidden="true">&times;</span>
 	       		</button>
       		</div>
 
-      		<div class="modal-body">
+      		<div class="modal-body" id="modal-edit">
 		        <input type="text" class="form-control" id="countryName" placeholder="Country name: "><br>
 		        <textarea class="form-control" id="shortDesc" placeholder="Short description: "></textarea><br>
 		        <textarea class="form-control" id="longDesc" placeholder="Long description: "></textarea>
 		        <input type="hidden" id="currentRowID" value="0">
       		</div>
+
+            <div class="modal-body" id="modal-view" style="display: none">
+                <h5> Short text </h5>
+                <div id="shortDescView"></div>
+                <br><br>
+                <h5> Long text </h5>
+                <div id="longDescView"></div>
+            </div>
 
 	      	<div class="modal-footer">
 	        	<input type="button" class="btn btn-secondary" data-dismiss="modal" value="Close">
@@ -37,12 +46,11 @@
  	</div>
 </div>
 
-
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<h2>MySQL Data Manager</h2>
 			<br><br>
-			<input style="float:right;" type="button" class="btn btn-success" data-toggle="modal" data-target="#tableManager" id="addNew" value="Add new">
+			<input style="float:right;" type="button" class="btn btn-success" data-toggle="modal" data-target="#modalReadEdit" id="addNew" value="Add new">
 				<table class="table table-hover table-bordered">
 					<thead class="thead-dark">
 						<tr>
@@ -76,7 +84,10 @@
             $("#countryName").val('');
             $("#shortDesc").val('');
             $("#longDesc").val('');
-            $("#actionButton").val('Insert').attr('class','btn btn-primary');
+            $("#actionButton").val('Insert').attr('class','btn btn-primary').attr('style','display: show');
+            $("#modal-edit").attr('style','display: show');
+            $("#modal-view").attr('style','display: none');   
+            $("#modalTitle").text("Insert data");     
         });
 
 		generateData(0,10);
@@ -109,7 +120,8 @@
 
     // this is function for reading data via ID,
     // fatching data with json
-	function readOrEdit(rowID)
+    // if type - 0, then is edit mode
+	function readOrEdit(rowID, readModal=0)
 	{
 		var countryName = $("#countryName");
 		var shortDesc = $("#shortDesc");
@@ -126,14 +138,47 @@
 			},
 			success: function(response)
 			{
-                $("#actionButton").val("Edit").attr('onclick','manageData("editRow")');
-				$("#currentRowID").val(response.rowID);
-				$("#countryName").val(response.countryName);
-				$("#shortDesc").val(response.shortDesc);
-				$("#longDesc").val(response.longDesc);
+                if(readModal == 0){
+                    $("#modal-edit").attr('style','display: show');
+                    $("#modal-view").attr('style','display: none');
+                    $("#modalTitle").text("Edit data")
+                    $("#actionButton").val("Edit").attr('onclick','manageData("editRow")').attr('style','display: show');
+                    $("#currentRowID").val(response.rowID);
+                    $("#countryName").val(response.countryName);
+                    $("#shortDesc").val(response.shortDesc);
+                    $("#longDesc").val(response.longDesc);
+                } else {
+                    $("#modal-edit").attr('style','display: none');
+                    $("#modal-view").attr('style','display: show');
+                    $("#modalTitle").text(response.countryName)
+                    $("#actionButton").attr('style','display: none');
+                    $("#currentRowID").val(response.rowID);
+                    $("#shortDescView").html(response.shortDesc);
+                    $("#longDescView").html(response.longDesc);                
+                }
 			}
 		});		
 	}
+
+    function deleteRow(rowID)
+    {
+            if(confirm("Are you sure?")) {
+                $.ajax({
+
+                    url: 'ajax.php',
+                    method: 'POST',
+                    dataType: 'text',
+                    data: {
+                        key: 'deleteRow',
+                        rowID: rowID
+                    },
+                    success: function(response)
+                        {
+                            $("#country_"+rowID).parent().remove();
+                        }
+                });
+            }
+    }
 
     // this is for button where we submit/edit fields
 	function manageData(key)
@@ -160,8 +205,8 @@
 				success: function(response)
 				{
 					if(response == 'success') {
-						$("#tableManager").modal('hide');
-
+						$("#modalReadEdit").modal('hide');
+                        $("#country_"+rowID.val()).text(countryName.val());
 						countryName.val('').css('border', '');
 						shortDesc.val('').css('border', '');
 						longDesc.val('').css('border', '');

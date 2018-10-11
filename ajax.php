@@ -26,9 +26,9 @@
 								<th>'.$data['id'].'</th>
 								<td id="country_'.$data['id'].'">'.$data['countryName'].'</td>
 								<td>
-									<input type="button" onclick="readOrEdit('.$data['id'].')" data-toggle="modal" data-target="#tableManager" class="btn btn-primary" value="Edit">
-									<input type="button" class="btn" value="View">
-									<input type="button" class="btn btn-danger" value="Delete">
+									<input type="button" onclick="readOrEdit('.$data['id'].')" data-toggle="modal" data-target="#modalReadEdit" class="btn btn-primary" value="Edit">
+									<input type="button" onclick="readOrEdit('.$data['id'].',1)" data-toggle="modal" data-target="#modalReadEdit" class="btn" value="View">
+									<input type="button" onclick="deleteRow('.$data['id'].')" id="deleteRow" class="btn btn-danger" value="Delete">
 								</td>
 							</tr>
 					';
@@ -85,7 +85,6 @@
 			$sql = "SELECT countryName, shortDesc, longDesc FROM country WHERE id='$rowID'";
 			$result = $conn->query($sql);
 
-
 			if($result->num_rows) {
 				$data = $result->fetch_assoc();
 
@@ -97,6 +96,19 @@
 				];
 
 				exit(json_encode($jsonResult));
+			}
+		}
+
+		if($_POST['key'] == 'deleteRow') {
+
+			$rowID = $conn->real_escape_string($_POST['rowID']);
+
+			$sql = "DELETE FROM country WHERE id = '$rowID'";
+
+			$result = $conn->query($sql);
+
+			if($result) {
+				exit($result);
 			}
 
 		}
