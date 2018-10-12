@@ -174,7 +174,11 @@
                     },
                     success: function(response)
                         {
-                            $("#country_"+rowID).parent().remove();
+                        	if(response == "success") {
+                           		$("#country_"+rowID).parent().remove();
+                        	} else {
+                        		alert(response);
+                        	}
                         }
                 });
             }
