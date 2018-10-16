@@ -21,11 +21,6 @@ class Database {
 		return self::$_connection;
 	}
 
-	public function escape($string)
-	{
-		return $this->_database->real_escape_string($string);
-	}
-
 	public function getExistingData($start, $limit)
 	{
 		$start = $this->escape($start);
@@ -34,25 +29,24 @@ class Database {
 		$sql = "SELECT id, countryName FROM country LIMIT $start, $limit";
 		$result = $this->_database->query($sql);
 
-			if($result->num_rows) {
-				$response = "";
-				while($data = $result->fetch_assoc())
-				{
-					$response.= '
-						<tr>
-							<th>'.$data['id'].'</th>
-							<td id="country_'.$data['id'].'">'.$data['countryName'].'</td>
-							<td>
-								<input type="button" onclick="readOrEdit('.$data['id'].')" data-toggle="modal" data-target="#modalReadEdit" class="btn btn-primary" value="Edit">
-								<input type="button" onclick="readOrEdit('.$data['id'].',1)" data-toggle="modal" data-target="#modalReadEdit" class="btn" value="View">
-								<input type="button" onclick="deleteRow('.$data['id'].')" id="deleteRow" class="btn btn-danger" value="Delete">
-							</td>
-						</tr>
-					';
-
-				}
-				return $response;
+		if($result->num_rows) {
+			$response = "";
+			while($data = $result->fetch_assoc())
+			{
+				$response.= '
+					<tr>
+						<th>'.$data['id'].'</th>
+						<td id="country_'.$data['id'].'">'.$data['countryName'].'</td>
+						<td>
+							<input type="button" onclick="readOrEdit('.$data['id'].')" data-toggle="modal" data-target="#modalReadEdit" class="btn btn-primary" value="Edit">
+							<input type="button" onclick="readOrEdit('.$data['id'].',1)" data-toggle="modal" data-target="#modalReadEdit" class="btn" value="View">
+							<input type="button" onclick="deleteRow('.$data['id'].')" id="deleteRow" class="btn btn-danger" value="Delete">
+						</td>
+					</tr>
+				';
 			}
+			return $response;
+		}
 		return 'reachedMax';
 	}
 
@@ -129,6 +123,11 @@ class Database {
 			return print_r($this);
 		}
 	}	
+
+	protected function escape($string)
+	{
+		return $this->_database->real_escape_string($string);
+	}
 }
 
 

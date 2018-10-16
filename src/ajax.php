@@ -5,7 +5,6 @@
 
 		$db = Database::connect();
 
-
 		if($_POST['key'] == 'getExistingData') {
 			exit($db->getExistingData($_POST['start'], $_POST['limit']));
 		}
@@ -19,12 +18,11 @@
 				'rowID' => $_POST['rowID']
 			];
 
-			if($_POST['key'] == 'insertRow'){
+			if($_POST['key'] == 'insertRow') {
 				exit($db->insertRow($data));
 			} else {
 				exit($db->editRow($data));
 			}
-			
 		}
 
 		if($_POST['key'] == 'readRow') {
@@ -33,6 +31,10 @@
 
 		if($_POST['key'] == 'deleteRow') {
 			exit($db->deleteRow($_POST['rowID']));
+		}
+
+		if($_POST['key'] == 'login') {
+			exit($db->login($_POST['username'], $_POST['password']));
 		}
 
 	}
