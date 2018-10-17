@@ -1,10 +1,17 @@
-<?php
-	include_once __DIR__ . "/../config/init.php";
+<!DOCTYPE html>
+<html>
+<head>
+	<?php 
+	require __DIR__ . "/../config/init.php";
 	if(!Session::exist('user')) {
 		header('Location: index.php');
+	} else {
+		$user = Session::get('user');
 	}
-?>
+	?>
 
+	<title>Database manager</title>
+</head>
 <div class="container" style="margin-top: 30px;">
 
 	<!-- Modal for edit/add -->
@@ -50,7 +57,11 @@
 		<div class="col-md-8 col-md-offset-2">
 			<h2>MySQL Data Manager</h2>
 			<br><br>
-			<input style="float:right;" type="button" class="btn btn-success" data-toggle="modal" data-target="#modalReadEdit" id="addNew" value="Add new">
+			<?php
+				if($user == 'admin') {
+					echo '<input style="float:right;" type="button" class="btn btn-success" data-toggle="modal" data-target="#modalReadEdit" id="addNew" value="Add new">';
+				}
+			?>
 			<table class="table table-hover table-bordered">
 				<thead class="thead-dark">
 					<tr>
@@ -67,3 +78,12 @@
 	</div>
 
 </div>
+</body>
+
+<script
+  src="http://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
+<?php require __DIR__ . '/js/table.js';

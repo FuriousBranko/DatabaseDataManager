@@ -1,3 +1,4 @@
+<script>
 	$(document).ready(function() {
         $("#addNew").on('click',function() {
             $("#countryName").val('');
@@ -156,3 +157,4 @@
 
 		return result;
 	}
+</script>

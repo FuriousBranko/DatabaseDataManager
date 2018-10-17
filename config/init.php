@@ -2,9 +2,9 @@
 
 session_start();
 
-	require_once __DIR__ . '/../src/ajax.php';
-	require_once __DIR__ . '/../src/Validation.class.php';
-	require_once __DIR__ . '/../src/Session.class.php';
+	spl_autoload_register(function($class) {
+		require_once __DIR__ . '/../src/' . $class . '.class.php';
+	});
 
 ?>
 

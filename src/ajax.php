@@ -1,12 +1,17 @@
 <?php
-	require('Database.class.php');
+	require_once __DIR__ . '/Database.class.php';
+	require_once __DIR__ . '/Session.class.php';
+	if(session_status() == PHP_SESSION_NONE) {
+		session_start();
+	}
 
 	if(isset($_POST['key'])) {
 
 		$db = Database::connect();
 
 		if($_POST['key'] == 'getExistingData') {
-			exit($db->getExistingData($_POST['start'], $_POST['limit']));
+			$user = Session::get('user');
+			exit($db->getExistingData($_POST['start'], $_POST['limit'], $user));
 		}
 
 		if($_POST['key'] == 'insertRow' || $_POST['key'] == 'editRow') {
@@ -31,10 +36,6 @@
 
 		if($_POST['key'] == 'deleteRow') {
 			exit($db->deleteRow($_POST['rowID']));
-		}
-
-		if($_POST['key'] == 'login') {
-			exit($db->login($_POST['username'], $_POST['password']));
 		}
 
 	}

@@ -21,7 +21,7 @@ class Database {
 		return self::$_connection;
 	}
 
-	public function getExistingData($start, $limit)
+	public function getExistingData($start, $limit, $user)
 	{
 		$start = $this->escape($start);
 		$limit = $this->escape($limit);
@@ -31,19 +31,37 @@ class Database {
 
 		if($result->num_rows) {
 			$response = "";
-			while($data = $result->fetch_assoc())
-			{
-				$response.= '
-					<tr>
-						<th>'.$data['id'].'</th>
-						<td id="country_'.$data['id'].'">'.$data['countryName'].'</td>
-						<td>
-							<input type="button" onclick="readOrEdit('.$data['id'].')" data-toggle="modal" data-target="#modalReadEdit" class="btn btn-primary" value="Edit">
-							<input type="button" onclick="readOrEdit('.$data['id'].',1)" data-toggle="modal" data-target="#modalReadEdit" class="btn" value="View">
-							<input type="button" onclick="deleteRow('.$data['id'].')" id="deleteRow" class="btn btn-danger" value="Delete">
-						</td>
-					</tr>
-				';
+			// if is user admin
+			if($user == 'admin') {
+				while($data = $result->fetch_assoc())
+				{
+					$response.= '
+						<tr>
+							<th>'.$data['id'].'</th>
+							<td id="country_'.$data['id'].'">'.$data['countryName'].'</td>
+							<td>
+								<input type="button" onclick="readOrEdit('.$data['id'].')" data-toggle="modal" data-target="#modalReadEdit" class="btn btn-primary" value="Edit">
+								<input type="button" onclick="readOrEdit('.$data['id'].',1)" data-toggle="modal" data-target="#modalReadEdit" class="btn" value="View">
+								<input type="button" onclick="deleteRow('.$data['id'].')" id="deleteRow" class="btn btn-danger" value="Delete">
+							</td>
+						</tr>
+					';
+				}
+				return $response;
+			} else {
+				// if is user not admin
+				while($data = $result->fetch_assoc())
+				{
+					$response.= '
+						<tr>
+							<th>'.$data['id'].'</th>
+							<td id="country_'.$data['id'].'">'.$data['countryName'].'</td>
+							<td>
+								<input type="button" onclick="readOrEdit('.$data['id'].',1)" data-toggle="modal" data-target="#modalReadEdit" class="btn" value="View">
+							</td>
+						</tr>
+					';
+				}
 			}
 			return $response;
 		}
